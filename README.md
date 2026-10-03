@@ -16,14 +16,14 @@
 
 ## 下载使用
 
-到 [Releases](https://github.com/Flyoverisblind/huoxingwen-converter/releases/latest) 下载对应平台的文件：
+到 [Releases](https://github.com/Flyoverisblind/huoxingwen-converter/releases/latest) 下载对应平台的文件（Release 里用英文文件名，方便分享链接；下载后改成中文名也一样能用）：
 
-| 平台 | 文件 | 说明 |
+| 平台 | Release 文件 | 说明 |
 | --- | --- | --- |
-| Windows | `火星文转换器.exe` | 免安装单文件，双击即用（约 640 KB，依赖系统自带 .NET Framework 4.x，Win8.1/10/11 已内置） |
-| Android | `火星文转换器-v1.0-android.apk` | Android 5.0+，601 KB，**不申请任何权限**（连联网权限都没有） |
-| 任意平台 | `火星文转换器.html` | 单文件网页版，双击用浏览器打开即可，支持离线与手机浏览器 |
-| 全平台 | `火星文转换器-v1.0-全平台测试包.zip` | 上面三个 + 使用说明 |
+| Windows | `huoxingwen-converter-v1.0-win.exe` | 免安装单文件，双击即用（约 640 KB，依赖系统自带 .NET Framework 4.x，Win8.1/10/11 已内置） |
+| Android | `huoxingwen-converter-v1.0-android.apk` | Android 5.0+，601 KB，**不申请任何权限**（连联网权限都没有） |
+| 任意平台 | `huoxingwen-converter-v1.0-portable.html` | 单文件网页版，双击用浏览器打开即可，支持离线与手机浏览器 |
+| 全平台 | `huoxingwen-converter-v1.0-all-platforms.zip` | 上面三个 + 使用说明，包内文件为中文名 |
 
 > Windows 首次运行若出现「Windows 已保护你的电脑」提示，点「更多信息 → 仍要运行」即可（程序未购买代码签名证书，属正常提示）。
 > 安卓安装时若提示「禁止安装未知来源应用」，在弹窗里点「设置」允许本次安装。
@@ -109,6 +109,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools/build_apk.ps1
 node tools/verify.mjs
 node tools/verify_web.mjs
 ```
+
+打 Release 用的英文名可以在上传时改（附件名不支持中文，GitHub 会静默忽略中文重命名）。
 
 说明：
 
