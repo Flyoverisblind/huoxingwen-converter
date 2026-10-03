@@ -1,0 +1,30 @@
+MIT License
+
+Copyright (c) 2026 Flyoverisblind
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+第三方数据说明（Third-party data notice）：
+
+* 简体 / 繁体 / 火星文 三张对照表（build/dict.tsv）整理自公开的火星文在线转换工具
+  http://huoxingwen.qianwanku.com/ 的转换规则，仅用于学习与个人使用，版权归原作者所有。
+* 智能消歧所用的字频与词组统计（build/smart.gz）由 jieba 分词词典（MIT License,
+  https://github.com/fxsjy/jieba ）离线统计生成。

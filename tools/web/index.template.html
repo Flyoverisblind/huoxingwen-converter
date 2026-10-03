@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>火星文转换器 · 简体 / 繁体 / 火星文 双向互转</title>
+<style>
+  :root{
+    --bg:#edf2f8; --card:#ffffff; --border:#d5deeb; --accent:#2d6ae9; --accent-soft:#e6effe;
+    --ink:#18243a; --muted:#6c7b92; --soft:#f6f9fd;
+    --shadow:0 1px 2px rgba(24,36,58,.06),0 8px 24px rgba(24,36,58,.06);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Microsoft YaHei UI","Microsoft YaHei","PingFang SC","Hiragino Sans GB","Source Han Sans SC",system-ui,sans-serif;
+    font-size:15px;line-height:1.5;display:flex;flex-direction:column;min-height:100vh;
+  }
+  .wrap{flex:1;display:flex;flex-direction:column;padding:18px 18px 8px;gap:12px;max-width:1500px;width:100%;margin:0 auto}
+  header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  h1{margin:0;font-size:26px;letter-spacing:.5px}
+  .sub{margin:4px 0 0;color:var(--muted);font-size:13px}
+  .bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .bar .grow{flex:1}
+  button{
+    font:inherit;font-size:14px;padding:7px 14px;border-radius:8px;border:1px solid var(--border);
+    background:#fff;color:var(--ink);cursor:pointer;transition:.15s;white-space:nowrap;
+  }
+  button:hover{background:var(--soft);border-color:#c3d2e6}
+  button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700}
+  button.primary:hover{background:#245ad0;border-color:#245ad0}
+  button.ghost{background:var(--accent-soft);border-color:transparent;color:var(--accent);font-weight:600}
+  button.ghost:hover{background:#d9e6fd}
+  .panes{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:14px;min-height:320px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:10px;display:flex;flex-direction:column;overflow:hidden;box-shadow:var(--shadow);transition:border-color .15s,box-shadow .15s}
+  .card.focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(45,106,233,.12)}
+  .card .head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 13px;background:var(--soft);border-bottom:1px solid var(--border);font-size:13px}
+  .card .head b{font-size:14px}
+  .card .head span{color:var(--muted);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  textarea{
+    flex:1;width:100%;border:0;outline:0;resize:none;padding:13px;font:inherit;font-size:16px;
+    line-height:1.7;color:var(--ink);background:transparent;min-height:260px;
+  }
+  .opts{display:flex;flex-wrap:wrap;gap:16px;align-items:center;color:var(--ink);font-size:14px}
+  .opts label{display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none}
+  input[type=checkbox]{width:16px;height:16px;accent-color:var(--accent)}
+  .status{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:12.5px;padding:0 2px 6px;flex-wrap:wrap}
+  .status .right{text-align:right}
+  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(12px);background:rgba(24,36,58,.92);color:#fff;
+    padding:9px 16px;border-radius:8px;font-size:14px;opacity:0;pointer-events:none;transition:.2s;z-index:9}
+  .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+  dialog{border:0;border-radius:12px;padding:0;max-width:640px;width:calc(100% - 32px);box-shadow:0 20px 60px rgba(24,36,58,.3)}
+  dialog::backdrop{background:rgba(24,36,58,.35)}
+  dialog .dh{padding:14px 18px;font-weight:700;border-bottom:1px solid var(--border)}
+  dialog .db{padding:16px 18px;font-size:14.5px;line-height:1.8;max-height:60vh;overflow:auto}
+  dialog .df{padding:12px 18px;text-align:right;border-top:1px solid var(--border)}
+  dialog code{background:var(--soft);padding:1px 5px;border-radius:4px}
+  @media (max-width:820px){
+    .wrap{padding:12px 12px 4px;gap:10px}
+    header{flex-wrap:nowrap;align-items:center}
+    .hdr-text{min-width:0;flex:1 1 auto;overflow:hidden}
+    h1{font-size:21px}
+    .sub{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    header button{padding:6px 10px}
+    .panes{grid-template-columns:1fr;min-height:0}
+    textarea{min-height:150px}
+    button{padding:7px 11px;font-size:13px}
+    .bar{width:100%;gap:6px}
+    .bar .grow{display:none}
+    /* 手机上按钮横向滚动，避免占掉好几行 */
+    #toolbar{display:flex;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+    #toolbar button{flex:0 0 auto;width:auto;padding:8px 12px}
+    .card .head span{display:none}
+    .card .head{padding:7px 12px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="hdr-text">
+      <h1>火星文转换器</h1>
+      <p class="sub">简体 / 繁体 / 火星文 双向互转 · 智能消歧 · 实时转换 · 纯本地运行，不联网</p>
+    </div>
+    <div class="bar">
+      <button class="ghost" id="btnHelp">使用说明</button>
+    </div>
+  </header>
+
+  <div class="bar" id="toolbar">
+    <button class="primary" id="btnToHx">中文 → 火星文</button>
+    <button class="ghost" id="btnToCn">火星文 → 中文</button>
+    <span class="grow"></span>
+    <button id="btnSwap">交换 ⇅</button>
+    <button id="btnCopyCn">复制中文</button>
+    <button id="btnCopyHx">复制火星文</button>
+    <button id="btnClear">清空</button>
+    <button id="btnSample">示例</button>
+  </div>
+
+  <div class="panes">
+    <div class="card" id="cardCn">
+      <div class="head"><b>中文（简体 / 繁体）</b><span>输入或粘贴中文，右侧即时得到火星文</span></div>
+      <textarea id="cn" spellcheck="false" placeholder="在这里输入或粘贴中文（简体、繁体都可以）……"></textarea>
+    </div>
+    <div class="card" id="cardHx">
+      <div class="head"><b>火星文</b><span>粘贴火星文，左侧即时还原中文</span></div>
+      <textarea id="hx" spellcheck="false" placeholder="在这里粘贴火星文，左侧会即时还原成中文……"></textarea>
+    </div>
+  </div>
+
+  <div class="opts">
+    <label><input type="checkbox" id="smart" checked>智能消歧（推荐）</label>
+    <label><input type="checkbox" id="trad">中文侧显示繁体</label>
+    <label><input type="checkbox" id="live" checked>实时转换</label>
+  </div>
+
+  <div class="status">
+    <span id="stLeft">就绪</span>
+    <span class="right" id="stRight"></span>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<dialog id="dlgHelp">
+  <div class="dh">使用说明</div>
+  <div class="db">
+    <p><b>怎么用</b><br>
+    1. 左边输入中文（简体或繁体），右边立刻得到火星文；<br>
+    2. 右边粘贴火星文，左边立刻还原成中文；<br>
+    3. 两侧都能直接编辑，互为输入输出，支持整段文字与多行；<br>
+    4. 把 <code>.txt</code> 文件拖进页面即可转换。</p>
+    <p><b>两个关键选项</b><br>
+    · <b>智能消歧</b>：火星文里同一个字往往对应好几个汉字（比如“妑”可以是芭/吧/巴/把/爸），
+    勾选后按字频与常用词组做全局最优判断，还原更准；取消则使用在线工具的首个匹配结果。<br>
+    · <b>中文侧显示繁体</b>：把中文一侧在简体与繁体之间切换。</p>
+    <p><b>说明</b><br>
+    本页面完全在本地运行，不上传任何文字，可离线使用（双击本文件即可）。<br>
+    对照表覆盖 <span id="helpSize"></span> 个常用汉字；表外生僻字、标点、emoji 原样保留。</p>
+  </div>
+  <div class="df"><button class="primary" id="btnHelpOk">知道了</button></div>
+</dialog>
+
+<script type="text/plain" id="dictData">{{DICT}}</script>
+<script type="text/plain" id="smartData">{{SMART}}</script>
+<script>
+{{ENGINE}}
+</script>
+<script>
+(function () {
+  var dictLines = document.getElementById('dictData').textContent.replace(/\r/g, '').replace(/\n+$/, '').split('\n');
+  var smartText = document.getElementById('smartData').textContent.replace(/\r/g, '');
+  var engine = makeEngine(dictLines[0] || '', dictLines[1] || '', dictLines[2] || '', smartText);
+
+  var cn = document.getElementById('cn');
+  var hx = document.getElementById('hx');
+  var smart = document.getElementById('smart');
+  var trad = document.getElementById('trad');
+  var live = document.getElementById('live');
+  var stLeft = document.getElementById('stLeft');
+  var stRight = document.getElementById('stRight');
+  var toastEl = document.getElementById('toast');
+  var syncing = false;
+  var lastEditor = cn;
+  var timer = null;
+
+  document.getElementById('stRight').textContent = '数据：' + engine.tableSize + ' 个常用汉字';
+  document.getElementById('helpSize').textContent = engine.tableSize;
+
+  function toast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('on');
+    clearTimeout(toastEl._t);
+    toastEl._t = setTimeout(function () { toastEl.classList.remove('on'); }, 1600);
+  }
+  function count(s) { return s ? s.replace(/\s/g, '').length : 0; }
+
+  function convertToMartian() {
+    var t0 = performance.now();
+    var src = cn.value, out = engine.toMartian(src), hit = 0;
+    for (var i = 0; i < src.length; i++) if (engine.isChinese(src.charAt(i))) hit++;
+    if (hx.value !== out) hx.value = out;
+    var ms = (performance.now() - t0).toFixed(1);
+    stLeft.textContent = '中文 → 火星文 · 输入 ' + count(src) + ' 字，命中 ' + hit + ' 字 · 输出 ' + count(out) + ' 字 · 用时 ' + ms + ' ms';
+  }
+
+  function convertToChinese() {
+    var t0 = performance.now();
+    var src = hx.value;
+    var useSmart = smart.checked;
+    var out = useSmart ? engine.toSimplifiedSmart(src) : engine.toSimplified(src);
+    if (trad.checked) out = engine.toTraditional(out);
+    var hit = 0, amb = 0;
+    for (var i = 0; i < src.length; i++) {
+      var n = engine.candidateCount(src.charAt(i));
+      if (n > 0) hit++;
+      if (n > 1) amb++;
+    }
+    if (cn.value !== out) cn.value = out;
+    var ms = (performance.now() - t0).toFixed(1);
+    stLeft.textContent = '火星文 → 中文（' + (useSmart ? '智能消歧' : '首个匹配') + '）· 输入 ' + count(src) + ' 字，命中 ' + hit + ' 字' +
+      (amb ? '，其中多义 ' + amb + ' 处' : '') + ' · 输出 ' + count(out) + ' 字 · 用时 ' + ms + ' ms';
+  }
+
+  function run() {
+    if (syncing) return;
+    if (lastEditor === hx) convertToChinese(); else convertToMartian();
+  }
+  function schedule() {
+    if (!live.checked) return;
+    clearTimeout(timer);
+    timer = setTimeout(run, 70);
+  }
+
+  cn.addEventListener('input', function () { if (syncing) return; lastEditor = cn; schedule(); });
+  hx.addEventListener('input', function () { if (syncing) return; lastEditor = hx; schedule(); });
+  [cn, hx].forEach(function (el, i) {
+    el.addEventListener('focus', function () {
+      document.getElementById(i === 0 ? 'cardCn' : 'cardHx').classList.add('focus');
+      document.getElementById(i === 1 ? 'cardCn' : 'cardHx').classList.remove('focus');
+    });
+    el.addEventListener('blur', function () { document.getElementById(i === 0 ? 'cardCn' : 'cardHx').classList.remove('focus'); });
+  });
+
+  document.getElementById('btnToHx').addEventListener('click', function () { lastEditor = cn; convertToMartian(); });
+  document.getElementById('btnToCn').addEventListener('click', function () { lastEditor = hx; convertToChinese(); });
+  document.getElementById('btnSwap').addEventListener('click', function () {
+    syncing = true;
+    var a = cn.value; cn.value = hx.value; hx.value = a;
+    syncing = false;
+    lastEditor = cn; run();
+    stLeft.textContent = '已交换左右两侧内容';
+  });
+  document.getElementById('btnClear').addEventListener('click', function () {
+    syncing = true; cn.value = ''; hx.value = ''; syncing = false;
+    stLeft.textContent = '已清空'; cn.focus();
+  });
+  var samples = [
+    '我爱你，你是我心中最美的风景。',
+    '今天的天气真不错，我们一起去公园散步吧！',
+    '无论走到哪里，都要记得最初的梦想。',
+    '生日快乐！愿你每天都开心快乐。',
+    '学习使我快乐，努力让我进步。'
+  ];
+  var si = 0;
+  document.getElementById('btnSample').addEventListener('click', function () {
+    cn.value = samples[si++ % samples.length];
+    lastEditor = cn; run(); cn.focus();
+  });
+
+  function copy(text, what) {
+    if (!text) { toast('没有可复制的' + what + '内容'); return; }
+    var done = function () { toast('已复制' + what + '（' + count(text) + ' 字）'); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, function () { fallback(); });
+    } else fallback();
+    function fallback() {
+      var ta = document.createElement('textarea');
+      ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(); } catch (e) { toast('复制失败，请手动选择文字复制'); }
+      document.body.removeChild(ta);
+    }
+  }
+  document.getElementById('btnCopyCn').addEventListener('click', function () { copy(cn.value, '中文'); });
+  document.getElementById('btnCopyHx').addEventListener('click', function () { copy(hx.value, '火星文'); });
+
+  smart.addEventListener('change', function () { if (cn.value || hx.value) { lastEditor = hx; convertToChinese(); } });
+  trad.addEventListener('change', function () {
+    syncing = true;
+    cn.value = trad.checked ? engine.toTraditional(cn.value) : engine.toSimplified(cn.value);
+    syncing = false;
+    stLeft.textContent = trad.checked ? '中文侧已切换为繁体' : '中文侧已切换为简体';
+  });
+
+  var dlg = document.getElementById('dlgHelp');
+  document.getElementById('btnHelp').addEventListener('click', function () {
+    if (dlg.showModal) dlg.showModal(); else alert('使用说明：左侧输入中文，右侧得到火星文；右侧粘贴火星文，左侧还原中文。');
+  });
+  document.getElementById('btnHelpOk').addEventListener('click', function () { dlg.close(); });
+
+  // 安卓客户端注入的桥接：在 App 里额外提供“粘贴 / 分享”按钮和更贴近手机的操作方式
+  var bridge = window.AndroidBridge;
+  if (bridge && typeof bridge.paste === 'function') {
+    var bar = document.getElementById('toolbar');
+    var bPaste = document.createElement('button');
+    bPaste.textContent = '粘贴';
+    bPaste.addEventListener('click', function () {
+      var t = bridge.paste();
+      if (!t) { toast('剪贴板里没有文字'); return; }
+      var box = (document.activeElement === hx) ? hx : cn;
+      box.value = t; lastEditor = box; run();
+      toast('已粘贴 ' + count(t) + ' 字');
+    });
+    var bShare = document.createElement('button');
+    bShare.textContent = '分享';
+    bShare.addEventListener('click', function () {
+      var t = hx.value || cn.value;
+      if (!t) { toast('还没有可分享的内容'); return; }
+      bridge.share(t);
+    });
+    bar.appendChild(bPaste);
+    bar.appendChild(bShare);
+    // 手机上没有“拖入文件”，替换说明文案
+    var db = dlg.querySelector('.db');
+    if (db) db.innerHTML = db.innerHTML.replace('4. 把 <code>.txt</code> 文件拖进页面即可转换。', '4. 用“粘贴”按钮可直接读取剪贴板内容，转换后可“分享”给其他应用。');
+  }
+
+  ['dragenter', 'dragover'].forEach(function (t) {
+    document.addEventListener(t, function (e) { e.preventDefault(); });
+  });
+  document.addEventListener('drop', function (e) {
+    e.preventDefault();
+    var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if (!f) return;
+    var r = new FileReader();
+    r.onload = function () { cn.value = r.result; lastEditor = cn; run(); toast('已载入文件：' + f.name); };
+    r.readAsText(f, 'utf-8');
+  });
+
+  // 初始化
+  cn.value = samples[0];
+  lastEditor = cn;
+  run();
+  cn.focus();
+  cn.setSelectionRange(cn.value.length, cn.value.length);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+# ---- 构建产物（dict.tsv / smart.gz 是程序运行必需的数据，保留在仓库里）----
+build/*
+!build/dict.tsv
+!build/smart.gz
+
+# ---- 第三方参考数据（体积大、可重新下载）----
+_ref/
+
+# ---- 签名证书与临时文件 ----
+android/keystore/
+*.jks
+*.keystore
+*.p12
+
+# ---- 中间产物 ----
+*.class
+*.dex
+*.o
+*.obj
+*.pdb
+*.user
+*.suo
+*.cache
+__pycache__/
+*.pyc
+.vs/
+.idea/
+.vscode/
+*.log
